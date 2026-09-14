@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>不知道遊戲 - 掛機釣魚 (手機端優化版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="./manifest.json">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
     body {
@@ -283,6 +284,15 @@
   </div>
 
   <script>
+    // 註冊 Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // 注意：因為你的專案在 /Reader/ 底下，路徑要寫對
+        navigator.serviceWorker.register('/Reader/sw.js')
+          .then(reg => console.log('Service Worker 註冊成功：', reg.scope))
+          .catch(err => console.log('Service Worker 註冊失敗：', err));
+      });
+    }
     let audioEnabled = true;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
