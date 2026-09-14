@@ -1,0 +1,22 @@
+{
+  "name": "釣魚",
+  "short_name": "曉釣",
+  "description": "掛機釣魚",
+  "start_url": "/fishing/",
+  "scope": "/fishing/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
