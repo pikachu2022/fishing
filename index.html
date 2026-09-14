@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>不知道遊戲 - 顏文字掛機釣魚</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+
+    /* 顏文字釣魚搖擺動畫 */
+    @keyframes gentleSway {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(1deg); }
+    }
+    .kaomoji-sway {
+      animation: gentleSway 3s ease-in-out infinite;
+    }
+
+    /* 彈出提示動畫 */
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
+    }
+    .pop-text {
+      animation: floatUp 1.2s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-mono min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+  <!-- 頂部資訊列 (Header Nav) -->
+  <header class="w-full bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 px-4 py-3 backdrop-blur-md">
+    <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-2">
+      <!-- 遊戲標題與時間 -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-lg">
+          <i class="fa-solid fa-fish"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base text-slate-100 flex items-center gap-2">
+            <span>不知道遊戲</span>
+            <!-- Speed control button for debug -->
+            <button id="btn-speed" onclick="toggleSpeed()" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] font-bold transition flex items-center gap-1">
+              <i class="fa-solid fa-bolt text-xs"></i>
+              <span id="speed-text">1x 速度</span>
+            </button>
+          </h1>
+          <p class="text-xs text-slate-400 flex items-center space-x-1">
+            <span>掛機時間:</span>
+            <strong id="stat-time-str" class="text-sky-400">00:00:00</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- 右側按鈕區塊 -->
+      <div class="flex items-center space-x-2">
+        <button onclick="openModal('shop')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition">
+          <i class="fa-solid fa-store text-amber-400"></i>
+          <span>商店</span>
+        </button>
+        <button onclick="openModal('photo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition">
+          <i class="fa-solid fa-book-open text-sky-400"></i>
+          <span>圖鑑</span>
+        </button>
+        <button onclick="openModal('archieve')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition">
+          <i class="fa-solid fa-trophy text-yellow-400"></i>
+          <span>成就</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主遊戲畫面 (Main Gameplay Area) -->
+  <main class="max-w-4xl w-full mx-auto p-4 flex-1 flex flex-col space-y-4">
+
+    <!-- 顏文字釣魚核心卡片 (Fisherman Kaomoji Display) -->
+    <div class="relative w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[240px] shadow-xl overflow-hidden">
+      <!-- 浮動文字提示區 -->
+      <div id="pop-container" class="absolute top-4 inset-x-0 flex justify-center pointer-events-none"></div>
+
+      <!-- 顏文字本體 -->
+      <div class="kaomoji-sway text-center my-4">
+        <pre id="kaomoji-display" class="font-mono text-2xl md:text-3xl text-sky-300 font-bold leading-relaxed tracking-wider select-none">
+　　　　　　︵
+（。＾▽＾）/　　\
+        </pre>
+      </div>
+
+      <!-- 目前動態狀態 -->
+      <div id="status-bubble" class="text-xs bg-slate-950/80 border border-slate-800 text-slate-300 px-4 py-1.5 rounded-full mt-2 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>🎣 自動釣魚中...</span>
+      </div>
+    </div>
+
+    <!-- 玩家數據面板 (Stats Dashboard) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <!-- 金幣 -->
+      <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col">
+        <span class="text-[11px] text-slate-400">持有金幣 (Coin)</span>
+        <div class="text-lg font-bold text-amber-400 mt-0.5 flex items-center space-x-1">
+          <i class="fa-solid fa-coins text-sm"></i>
+          <span id="stat-coins">600</span>
+        </div>
+      </div>
+
+      <!-- 經驗值 -->
+      <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col">
+        <span class="text-[11px] text-slate-400">等級經驗 (EXP)</span>
+        <div class="text-lg font-bold text-sky-400 mt-0.5 flex items-center space-x-1">
+          <i class="fa-solid fa-bolt text-sm"></i>
+          <span id="stat-exp">0 / 25</span>
+        </div>
+      </div>
+
+      <!-- 當前釣竿 -->
+      <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col">
+        <span class="text-[11px] text-slate-400">目前釣竿 (Weapon)</span>
+        <div id="stat-weapon-name" class="text-sm font-bold text-emerald-400 mt-1 truncate">
+          bamboo
+        </div>
+        <span id="stat-weapon-chance" class="text-[10px] text-slate-500">咬鉤機率: 2%</span>
+      </div>
+
+      <!-- 當前 Buff -->
+      <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col">
+        <span class="text-[11px] text-slate-400">生效 Buff</span>
+        <div id="stat-buff-name" class="text-sm font-bold text-indigo-400 mt-1 truncate">
+          無
+        </div>
+        <span id="stat-buff-chance" class="text-[10px] text-slate-500">稀有加成: 1%</span>
+      </div>
+    </div>
+
+    <!-- 釣魚日誌 (Activity Log) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-56">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800 mb-2">
+        <span class="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
+          <i class="fa-solid fa-scroll text-slate-400"></i>
+          <span>釣魚歷程 (Log)</span>
+        </span>
+        <button onclick="clearLog()" class="text-[10px] text-slate-500 hover:text-slate-300">清除日誌</button>
+      </div>
+
+      <div id="log-content" class="flex-1 overflow-y-auto space-y-1.5 text-xs font-mono pr-1">
+        <div class="text-slate-600 italic">掛機系統運作中，等待魚兒咬鉤...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 遮罩 -->
+  <div id="modal-backdrop" onclick="closeModals()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden"></div>
+
+  <!-- 商店彈窗 (Shop) -->
+  <div id="modal-shop" class="fixed inset-x-4 top-16 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[500px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 hidden flex flex-col overflow-hidden max-h-[80vh]">
+    <div class="px-5 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+      <h3 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+        <i class="fa-solid fa-store text-amber-400"></i>
+        <span>漁夫商店 (Shop)</span>
+      </h3>
+      <button onclick="closeModals()" class="text-slate-500 hover:text-slate-200 text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="shop-list" class="p-4 overflow-y-auto space-y-2.5 flex-1">
+      <!-- 動態渲染商店品項 -->
+    </div>
+  </div>
+
+  <!-- 圖鑑彈窗 (Encyclopedia) -->
+  <div id="modal-photo" class="fixed inset-x-4 top-16 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[640px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 hidden flex flex-col overflow-hidden max-h-[80vh]">
+    <div class="px-5 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+      <h3 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+        <i class="fa-solid fa-book-open text-sky-400"></i>
+        <span>海洋圖鑑 (Encyclopedia)</span>
+      </h3>
+      <button onclick="closeModals()" class="text-slate-500 hover:text-slate-200 text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="photo-list" class="p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 flex-1">
+      <!-- 動態渲染圖鑑內容 -->
+    </div>
+  </div>
+
+  <!-- 成就彈窗 (Achievements) -->
+  <div id="modal-archieve" class="fixed inset-x-4 top-16 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[500px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 hidden flex flex-col overflow-hidden max-h-[80vh]">
+    <div class="px-5 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+      <h3 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+        <i class="fa-solid fa-trophy text-yellow-400"></i>
+        <span>成就系統 (Achievements)</span>
+      </h3>
+      <button onclick="closeModals()" class="text-slate-500 hover:text-slate-200 text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="archieve-list" class="p-4 overflow-y-auto space-y-2.5 flex-1">
+      <!-- 動態渲染成就內容 -->
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="w-full text-center py-3 text-[11px] text-slate-600 border-t border-slate-900">
+    不知道遊戲 &copy; 2026 • 顏文字掛機釣魚版
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       魚種中文名稱對照表 (A-Z 普通魚 & A+-Z+ 稀有魚)
+       ========================================================================== */
+    const fishSpeciesNames = {
+      'a': '小金魚',   'b': '泡泡魚',   'c': '小丑魚',   'd': '飛魚',     'e': '河豚',
+      'f': '秋刀魚',   'g': '鮭魚',     'h': '翻車魚',   'i': '墨魚',     'j': '水母',
+      'k': '鰻魚',     'l': '水晶蝦',   'm': '螃蟹',     'n': '鮟鱇魚',   'o': '章魚',
+      'p': '旗魚',     'q': '鮪魚',     'r': '祝賀鯛魚', 's': '比目魚',   't': '海馬',
+      'u': '海龜',     'v': '魟魚',     'w': '鯨鯊',     'x': '海豚',     'y': '虎鯨',
+      'z': '利維坦',
+
+      'a+': '✨ 耀金魚',   'b+': '✨ 幻彩泡泡', 'c+': '✨ 霸王小丑', 'd+': '✨ 極光飛魚', 'e+': '✨ 刺刺王河豚',
+      'f+': '✨ 烈焰秋刀', 'g+': '✨ 帝王鮭魚', 'h+': '✨ 巨型翻車', 'i+': '✨ 深海墨皇', 'j+': '✨ 發光水母',
+      'k+': '✨ 電光鰻魚', 'l+': '✨ 琉璃龍蝦', 'm+': '✨ 帝王帝王蟹','n+': '✨ 深海燈籠', 'o+': '✨ 八爪巨怪',
+      'p+': '✨ 藍槍旗魚', 'q+': '✨ 黑金鮪魚', 'r+': '✨ 金輝紅鯛', 's+': '✨ 隱形比目', 't+': '✨ 翡翠海馬',
+      'u+': '✨ 千年靈龜', 'v+': '✨ 鬼蝠魟',   'w+': '✨ 星空鯨鯊', 'x+': '✨ 粉紅海豚', 'y+': '✨ 霸王虎鯨',
+      'z+': '✨ 遠古利維坦'
+    };
+
+    /* ==========================================================================
+       原始數據結構 (100% 保持原本變數與邏輯)
+       ========================================================================== */
+    let coin = 600;
+    let exp = 0;
+    let k = 0;
+    let gameSpeed = 1; // 除錯用倍速 (1x, 2x, 4x, 8x)
+
+    // 價目表 a 與 數量表 b
+    const a = {};
+    const b = {};
+
+    for (let i = 0; i < 26; i++) {
+      const char = String.fromCharCode(97 + i);
+      a[char] = 40;            // 普通魚單價
+      a[char + '+'] = 100;     // 稀有魚單價
+      b[char] = 0;             // 普通魚捕獲量
+      b[char + '+'] = 0;       // 稀有魚捕獲量
+    }
+
+    // 成就資料結構: [0: 未解鎖(1)/已解鎖(0), 1: 需求數值, 2: 獎勵金幣, 3: 標題, 4: 描述]
+    const archieve = {
+      'a':  [1, 660, 300, '儲蓄新手', '累積持有 660 金幣'],
+      'b':  [1, 1200, 600, '小有積蓄', '累積持有 1200 金幣'],
+      'c':  [1, 1800, 900, '釣魚達人', '累積持有 1800 金幣'],
+      'd':  [1, 3600, 1800, '深海富豪', '累積持有 3600 金幣'],
+      'e':  [1, 7200, 3600, '千萬富翁', '累積持有 7200 金幣'],
+      'a+': [1, 5, 300, '經驗入門', '累積 EXP 達到 5'],
+      'b+': [1, 25, 600, '經驗熟練', '累積 EXP 達到 25'],
+      'c+': [1, 125, 3600, '經驗專家', '累積 EXP 達到 125'],
+      'd+': [1, 625, 10800, '經驗大師', '累積 EXP 達到 625'],
+      'e+': [1, 3125, 43200, '釣神降臨', '累積 EXP 達到 3125']
+    };
+
+    // 釣竿裝備結構: [0: 解鎖狀態(1/0), 1: 名稱, 2: 咬鉤率, 3: 購買價格]
+    const weapon = {
+      'e':  [1, 'bamboo (竹製釣竿)', 0.02, 0],
+      'a+': [0, 'trash (破舊釣竿)', 0.05, 500],
+      'b+': [0, 'normal (普通釣竿)', 0.08, 1200],
+      'c+': [0, 'great (強化釣竿)', 0.17, 3000],
+      'd+': [0, 'excellent (精銳釣竿)', 0.35, 8000],
+      'e+': [0, 'legend (傳奇釣竿)', 0.50, 20000]
+    };
+
+    // Buff 機制
+    const buff = {
+      'timer': [0, 'chance++(limit)', 0.01],
+      '0+': [1, '基本運氣', 0.01],
+      'a+': [0, 'chance++ I', 0.1],
+      'b+': [0, 'chance++ II', 0.2],
+      'c+': [0, 'chance++ III', 0.3],
+      'd+': [0, 'chance++ IV', 0.3],
+      'e+': [0, 'chance++ MAX', 0.49]
+    };
+
+    // 顏文字表情對照
+    const faces = {
+      idle: "　　　　　　︵\n（。＾▽＾）/　　\\",
+      rare: "\n~\\(≧▽≦)/~",
+      normal: "\no(￣▽￣)ｄ",
+      miss: "\n/(ㄒoㄒ)/~~"
+    };
+
+    /* ==========================================================================
+       核心遊戲循環 (嚴格對照 main.js 的計算邏輯)
+       ========================================================================== */
+    function game() {
+      const now = new Date();
+
+      // 整點補給金幣 (+600)
+      let dd = now.getHours();
+      if (window.lastHour !== undefined && window.lastHour !== dd) {
+        coin += 600;
+        logMsg('⏰ 整點補給！獲得金幣 +600', 'system');
+      }
+      window.lastHour = dd;
+
+      // 前 11 分鐘觸發 Timer Buff
+      if (now.getMinutes() < 11) {
+        buff['timer'][0] = 1;
+      } else {
+        buff['timer'][0] = 0;
+      }
+
+      // 金幣即掛機時間池
+      if (coin > 0) {
+        k = 1;
+        coin -= 1;
+      } else {
+        k = 0;
+      }
+
+      // 嚴格對照 main.js: weapons 與 buffs 為最後一個已開啟項目的數值
+      let weapons = 0;
+      for (let i of Object.keys(weapon)) {
+        if (weapon[i][0] == 1) {
+          weapons = weapon[i][2];
+        }
+      }
+
+      let buffs = 0;
+      for (let i of Object.keys(buff)) {
+        if (buff[i][0] == 1) {
+          buffs = buff[i][2];
+        }
+      }
+
+      // 自動釣魚判定 (完全保持原本判定順序與隨機數計算)
+      if (k === 1) {
+        let faceText = faces.idle;
+        let p = Math.random();
+
+        // 判定 1: 咬鉤率 (p < weapons)
+        if (p < weapons) {
+          p = Math.random();
+          let fishIdx = Math.floor(Math.random() * 26);
+          let charCode = String.fromCharCode(97 + fishIdx);
+          let fishLetterUpper = String.fromCharCode(65 + fishIdx);
+
+          if (p < buffs) {
+            // 判定 2a: 釣到稀有 (+) 魚
+            const key = charCode + '+';
+            const fishFullName = `${fishLetterUpper}+ ${fishSpeciesNames[key] || ''}`;
+            const earnedCoin = a[key];
+
+            b[key] += 1;
+            coin += earnedCoin;
+            exp += 100;
+            faceText = faces.rare;
+
+            logMsg(`✨ [特級咬鉤] 釣到了 <strong>${fishFullName}</strong>！金幣 +${earnedCoin}, EXP +100`, 'rare');
+            showPopText(`+${earnedCoin} G (EXP +100)`, 'text-amber-400');
+          } 
+          else if (p < (buffs + 0.49)) {
+            // 判定 2b: 釣到普通魚
+            const fishFullName = `${fishLetterUpper} ${fishSpeciesNames[charCode] || ''}`;
+            const earnedCoin = a[charCode];
+
+            b[charCode] += 1;
+            coin += earnedCoin;
+            exp += 1;
+            faceText = faces.normal;
+
+            logMsg(`🐟 [普通咬鉤] 釣到了 <strong>${fishFullName}</strong>！金幣 +${earnedCoin}, EXP +1`, 'normal');
+            showPopText(`+${earnedCoin} G`, 'text-sky-400');
+          } 
+          else {
+            // 判定 2c: 脫鉤 (啥都沒有)
+            faceText = faces.miss;
+            logMsg(`💦 哎呀！魚脫鉤溜走了...`, 'miss');
+          }
+        }
+
+        // 更新顏文字畫面
+        document.getElementById('kaomoji-display').innerText = faceText;
+
+        // 觸發成就檢查與連動 Buff 檢查 (同 main.js)
+        coin += arc(archieve, exp, coin);
+        // 已移除 wea(weapon, archieve) 自動購買釣竿
+        buf(b, buff);
+      } else {
+        document.getElementById('kaomoji-display').innerText = " (  x _ x ) \n無掛機時間，請補給金幣";
+      }
+
+      // 更新介面
+      updateUI();
+
+      // 倍速控制 (1x = 1000ms, 2x = 500ms, 4x = 250ms, 8x = 125ms)
+      setTimeout(game, 1000 / gameSpeed);
+    }
+
+    /* ==========================================================================
+       輔助邏輯 (成就驗證, Buff驗證, 裝備連動)
+       ========================================================================== */
+    function arc(a, exp, coin) {
+      for (let i of Object.keys(a)) {
+        if (a[i][0] == 1) { // 尚未解鎖
+          if (/\+/.test(i)) {
+            if (exp >= a[i][1]) {
+              a[i][0] = 0; // 標記已解鎖
+              logMsg(`🏆 解鎖成就【${a[i][3]}】！獲得獎勵金幣 +${a[i][2]}`, 'system');
+              return a[i][2];
+            }
+          } else {
+            if (coin >= a[i][1]) {
+              a[i][0] = 0;
+              logMsg(`🏆 解鎖成就【${a[i][3]}】！獲得獎勵金幣 +${a[i][2]}`, 'system');
+              return a[i][2];
+            }
+          }
+        }
+      }
+      return 0;
+    }
+
+    function buf(b, buff) {
+      let c = Infinity, d = Infinity;
+      for (let i of Object.keys(b)) {
+        if (/\+/.test(i)) {
+          d = Math.min(d, b[i]);
+        } else {
+          c = Math.min(c, b[i]);
+        }
+      }
+      if (c >= 1) buff['a+'][0] = 1;
+      if (c >= 10) buff['b+'][0] = 1;
+      if (c >= 50) {
+      buff['c+'][0] = 1;
+      if (d >= 1) buff['d+'][0] = 1;
+      if (d >= 10) buff['e+'][0] = 1;
+    }
+  }
+
+  function wea(w, a) {
+    // 釣竿不自動解鎖，需由玩家在商店手動購買
+  }
+
+  // 倍速切換 (Debug 用)
+    function toggleSpeed() {
+      if (gameSpeed === 1) gameSpeed = 2;
+      else if (gameSpeed === 2) gameSpeed = 4;
+      else if (gameSpeed === 4) gameSpeed = 8;
+      else gameSpeed = 1;
+
+      document.getElementById('speed-text').innerText = `${gameSpeed}x 速度`;
+      showPopText(`⚡ 遊戲速度: ${gameSpeed}x`, 'text-amber-300');
+    }
+
+    /* ==========================================================================
+       UI 畫面更新與渲染
+       ========================================================================== */
+    function updateUI() {
+      document.getElementById('stat-coins').innerText = coin.toLocaleString();
+      document.getElementById('stat-time-str').innerText = formatTime(coin);
+
+      // 計算當前經驗值需求 (參考 state 函式)
+      let reqExp = 25;
+      for (let i of Object.keys(archieve)) {
+        if (/\+/.test(i) && archieve[i][0] == 0) {
+          reqExp = archieve[i][1];
+        }
+      }
+      document.getElementById('stat-exp').innerText = `${exp} / ${reqExp * 5}`;
+
+      // 當前裝備 (最後一個已開啟的武器)
+      let curWeaponName = weapon['e'][1];
+      let curWeaponChance = weapon['e'][2];
+      for (let i of Object.keys(weapon)) {
+        if (weapon[i][0] == 1) {
+          curWeaponName = weapon[i][1];
+          curWeaponChance = weapon[i][2];
+        }
+      }
+      document.getElementById('stat-weapon-name').innerText = curWeaponName;
+      document.getElementById('stat-weapon-chance').innerText = `咬鉤機率: ${Math.round(curWeaponChance * 100)}%`;
+
+      // 當前 Buff (最後一個生效的 Buff)
+      let activeBuffName = "無";
+      let activeBuffChance = 0.01;
+      for (let i of Object.keys(buff)) {
+        if (buff[i][0] == 1) {
+          activeBuffName = buff[i][1];
+          activeBuffChance = buff[i][2];
+        }
+      }
+      document.getElementById('stat-buff-name').innerText = activeBuffName;
+      document.getElementById('stat-buff-chance').innerText = `稀有加成: ${Math.round(activeBuffChance * 100)}%`;
+    }
+
+    function formatTime(seconds) {
+      let h = Math.floor(seconds / 3600);
+      let m = Math.floor((seconds % 3600) / 60);
+      let s = seconds % 60;
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function logMsg(msg, type = 'normal') {
+      const container = document.getElementById('log-content');
+      const timeStr = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+
+      div.className = 'py-0.5 px-2 rounded flex justify-between items-center text-[11px] ';
+      if (type === 'rare') {
+        div.className += 'bg-amber-500/10 text-amber-300 border-l-2 border-amber-400';
+      } else if (type === 'normal') {
+        div.className += 'bg-sky-500/10 text-sky-200 border-l-2 border-sky-400';
+      } else if (type === 'system') {
+        div.className += 'bg-purple-500/10 text-purple-300 border-l-2 border-purple-400';
+      } else {
+        div.className += 'bg-slate-800/40 text-slate-400';
+      }
+
+      div.innerHTML = `<span>${msg}</span><span class="text-[9px] opacity-40 ml-2">${timeStr}</span>`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log-content').innerHTML = '<div class="text-slate-600 italic">日誌已清除。</div>';
+    }
+
+    function showPopText(text, colorClass) {
+      const popBox = document.getElementById('pop-container');
+      const el = document.createElement('div');
+      el.className = `pop-text font-bold text-sm ${colorClass}`;
+      el.innerText = text;
+      popBox.appendChild(el);
+      setTimeout(() => el.remove(), 1200);
+    }
+
+    /* ==========================================================================
+       彈窗 Modal 功能 (商店, 圖鑑, 成就)
+       ========================================================================== */
+    function openModal(type) {
+      closeModals();
+      document.getElementById('modal-backdrop').classList.remove('hidden');
+
+      if (type === 'shop') {
+        renderShop();
+        document.getElementById('modal-shop').classList.remove('hidden');
+      } else if (type === 'photo') {
+        renderPhoto();
+        document.getElementById('modal-photo').classList.remove('hidden');
+      } else if (type === 'archieve') {
+        renderArchieve();
+        document.getElementById('modal-archieve').classList.remove('hidden');
+      }
+    }
+
+    function closeModals() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+      document.getElementById('modal-shop').classList.add('hidden');
+      document.getElementById('modal-photo').classList.add('hidden');
+      document.getElementById('modal-archieve').classList.add('hidden');
+    }
+
+    // 渲染商店 (Shop)
+    function renderShop() {
+      const list = document.getElementById('shop-list');
+      list.innerHTML = '';
+
+      for (let key of Object.keys(weapon)) {
+        const item = weapon[key];
+        const isOwned = item[0] === 1;
+        const price = item[3];
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border flex items-center justify-between ${isOwned ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-950/80 border-slate-700'}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-xs text-slate-200">${item[1]}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">咬鉤機率: <strong class="text-emerald-400">${Math.round(item[2] * 100)}%</strong></div>
+          </div>
+          <div>
+            ${isOwned 
+              ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">已擁有</span>`
+              : `<button onclick="buyWeapon('${key}')" class="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition">
+                   ${price} 金幣 購買
+                 </button>`
+            }
+          </div>
+        `;
+        list.appendChild(card);
+      }
+    }
+
+    function buyWeapon(key) {
+      const item = weapon[key];
+      const price = item[3];
+
+      if (coin >= price) {
+        coin -= price;
+        item[0] = 1; // 標記解鎖
+
+        logMsg(`🛒 成功購買 <strong>${item[1]}</strong>！咬鉤率升至 ${Math.round(item[2] * 100)}%`, 'system');
+        renderShop();
+        updateUI();
+      } else {
+        showPopText(`金幣不足！需 ${price} 金幣`, 'text-rose-400');
+      }
+    }
+
+    // 渲染圖鑑 (Encyclopedia) - 包含魚種暱稱
+    function renderPhoto() {
+      const list = document.getElementById('photo-list');
+      list.innerHTML = '';
+
+      for (let i = 0; i < 26; i++) {
+        const char = String.fromCharCode(97 + i);
+        const letterUpper = String.fromCharCode(65 + i);
+
+        // 普通魚
+        const normalKey = char;
+        const normalName = `${letterUpper}. ${fishSpeciesNames[normalKey]}`;
+        const normalCount = b[normalKey];
+        list.appendChild(createPhotoCard(normalName, normalCount, a[normalKey], false));
+
+        // 稀有魚
+        const shinyKey = char + '+';
+        const shinyName = `${letterUpper}+. ${fishSpeciesNames[shinyKey]}`;
+        const shinyCount = b[shinyKey];
+        list.appendChild(createPhotoCard(shinyName, shinyCount, a[shinyKey], true));
+      }
+    }
+
+    function createPhotoCard(displayName, count, price, isShiny) {
+      const card = document.createElement('div');
+      const isCaught = count > 0;
+
+      card.className = `p-2.5 rounded-xl border flex flex-col justify-between ${
+        isCaught 
+          ? (isShiny ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-950/60 border-slate-800')
+          : 'bg-slate-950/80 border-slate-900 opacity-40'
+      }`;
+
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-1 gap-1">
+          <span class="font-bold text-[11px] truncate ${isShiny ? 'text-amber-300' : 'text-slate-200'}">${isCaught ? displayName : '???'}</span>
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${isCaught ? 'bg-slate-800 text-slate-300' : 'bg-slate-900 text-slate-600'}">
+            x${count}
+          </span>
+        </div>
+        <div class="text-[10px] text-slate-500 flex justify-between items-center mt-1">
+          <span>價值:</span>
+          <span class="text-amber-400 font-bold">${price} G</span>
+        </div>
+      `;
+      return card;
+    }
+
+    // 渲染成就 (Achievements)
+    function renderArchieve() {
+      const list = document.getElementById('archieve-list');
+      list.innerHTML = '';
+
+      for (let key of Object.keys(archieve)) {
+        const item = archieve[key];
+        const isUnlocked = item[0] === 0;
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border flex items-center justify-between ${isUnlocked ? 'bg-purple-950/20 border-purple-500/30' : 'bg-slate-950/50 border-slate-800'}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-xs ${isUnlocked ? 'text-purple-300' : 'text-slate-300'}">${item[3]}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">${item[4]}</div>
+          </div>
+          <div>
+            ${isUnlocked 
+              ? `<span class="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">已達成 (+${item[2]}G)</span>`
+              : `<span class="text-[10px] text-slate-600 italic">未達成</span>`
+            }
+          </div>
+        `;
+        list.appendChild(card);
+      }
+    }
+
+    /* ==========================================================================
+       初始化
+       ========================================================================== */
+    window.onload = function() {
+      updateUI();
+      logMsg('🌊 歡迎回到《不知道遊戲》！顏文字漁夫已開始為您自動掛機釣魚。', 'system');
+      setTimeout(game, 1000);
+    };
+  </script>
+</body>
+</html>
