@@ -1,6 +1,6 @@
 {
-  "name": "曉釣",
-  "short_name": "釣魚",
+  "name": "曉釣歌頭",
+  "short_name": "曉釣",
   "description": "掛機釣魚",
   "start_url": "/fishing/",
   "scope": "/fishing/",
