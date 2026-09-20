@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>不知道遊戲 - 掛機釣魚 (手機端優化版)</title>
+  <title>不知道遊戲 - 掛機釣魚 (豪華升級版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="min-h-[100dvh] flex flex-col justify-between items-center p-2 sm:p-4 overflow-x-hidden max-w-md mx-auto sm:max-w-xl md:max-w-2xl">
 
-  <header class="w-full bg-slate-800/95 border border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-lg flex flex-wrap justify-between items-center gap-2 z-10">
+  <header class="w-full bg-slate-800/95 border border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-xl flex flex-wrap justify-between items-center gap-2 z-10 backdrop-blur-md">
     <div class="flex items-center gap-2.5">
       <div class="text-2xl sm:text-3xl animate-bounce">🎣</div>
       <div>
         <h1 class="font-bold text-sm sm:text-lg text-amber-400 leading-tight flex items-center gap-1.5 flex-wrap">
-          不知道遊戲 <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">v2.19 手機優化版</span>
+          不知道遊戲 <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">v2.3 豪華檢查版</span>
         </h1>
-        <p class="text-[11px] text-slate-400">極簡掛機釣魚 · 手機端適配</p>
+        <p class="text-[11px] text-slate-400">極簡掛機釣魚 · 海中賭場娛樂 · 任務成就</p>
       </div>
     </div>
 
@@ -32,15 +32,15 @@
     </div>
 
     <div class="w-full grid grid-cols-3 gap-1.5 mt-1 pt-1.5 border-t border-slate-700/50 text-[11px] sm:text-sm font-medium">
-      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center">
+      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center shadow-inner">
         <span class="text-amber-400 text-[10px] sm:text-xs">🪙 金幣</span>
         <span id="stat-coins" class="text-amber-300 font-bold truncate w-full">600</span>
       </div>
-      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center">
+      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center shadow-inner">
         <span class="text-cyan-400 text-[10px] sm:text-xs">⭐ 經驗</span>
         <span id="stat-exp" class="text-cyan-300 font-bold truncate w-full">Lv.0</span>
       </div>
-      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center">
+      <div class="bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center text-center shadow-inner">
         <span class="text-emerald-400 text-[10px] sm:text-xs">⏱️ 時間</span>
         <span id="stat-time-str" class="text-emerald-300 font-bold truncate w-full">10分00秒</span>
       </div>
@@ -49,7 +49,7 @@
 
   <main class="w-full my-auto flex flex-col items-center justify-center py-2 sm:py-4">
 
-    <div id="fishing-stage" class="w-full bg-slate-800/70 border border-slate-700/80 rounded-3xl p-4 sm:p-8 text-center shadow-xl backdrop-blur-md relative overflow-hidden min-h-[200px] sm:min-h-[230px] flex flex-col items-center justify-center">
+    <div id="fishing-stage" class="w-full bg-gradient-to-b from-slate-800/80 to-slate-900/90 border border-slate-700/80 rounded-3xl p-4 sm:p-8 text-center shadow-2xl backdrop-blur-md relative overflow-hidden min-h-[220px] sm:min-h-[250px] flex flex-col items-center justify-center water-ripple">
       
       <div id="float-container" class="absolute inset-0 pointer-events-none flex items-center justify-center"></div>
 
@@ -58,9 +58,9 @@
 （。＾▽＾）/　　\
       </div>
 
-      <div id="fishing-status-tag" class="mt-3 text-[11px] font-medium px-3 py-1 rounded-full bg-slate-900/90 text-cyan-300 border border-slate-700 flex items-center gap-1.5 shadow-sm">
+      <div id="fishing-status-tag" class="mt-4 text-[11px] font-medium px-3.5 py-1.5 rounded-full bg-slate-900/95 text-cyan-300 border border-slate-700/80 flex items-center gap-1.5 shadow-md">
         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-        掛機釣魚中...
+        掛機釣魚進行中... 點擊表情互動有驚喜！
       </div>
     </div>
 
@@ -77,27 +77,30 @@
   </main>
 
   <footer class="w-full flex flex-col gap-2.5 z-10 pb-1">
-    <div class="grid grid-cols-5 gap-1.5">
-      <button onclick="openModal('modal-shop')" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold py-3 px-1 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[11px]">
-        <span class="text-base sm:text-lg">🛒</span> 商店
+    <div class="grid grid-cols-6 gap-1">
+      <button onclick="openModal('modal-shop')" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">🛒</span> 商店
       </button>
-      <button onclick="openModal('modal-fountain')" class="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-slate-950 font-bold py-3 px-1 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[11px]">
-        <span class="text-base sm:text-lg">⛲</span> 許願
+      <button onclick="openModal('modal-fountain')" class="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">⛲</span> 許願
       </button>
-      <button onclick="openModal('modal-photo')" class="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-bold py-3 px-1 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[11px]">
-        <span class="text-base sm:text-lg">📖</span> 圖鑑
+      <button onclick="openModal('modal-casino')" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">🎰</span> 賭場
       </button>
-      <button onclick="openModal('modal-archive')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-bold py-3 px-1 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[11px]">
-        <span class="text-base sm:text-lg">🏆</span> 成就
+      <button onclick="openModal('modal-photo')" class="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">📖</span> 圖鑑
       </button>
-      <button onclick="openModal('modal-stats')" class="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-slate-950 font-bold py-3 px-1 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[11px]">
-        <span class="text-base sm:text-lg">⚙️</span> 設定
+      <button onclick="openModal('modal-archive')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">🏆</span> 成就
+      </button>
+      <button onclick="openModal('modal-stats')" class="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-slate-950 font-bold py-2.5 px-0.5 rounded-xl shadow-md transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-xs">
+        <span class="text-base">⚙️</span> 設定
       </button>
     </div>
 
     <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-2.5 shadow-inner">
       <div class="text-[11px] text-slate-400 mb-1 font-medium flex justify-between items-center px-1">
-        <span>📜 釣魚歷程:</span>
+        <span>📜 釣魚歷程紀錄:</span>
         <span class="text-[9px] text-slate-500">自動紀錄最近事件</span>
       </div>
       <div id="log-box" class="h-20 sm:h-24 overflow-y-auto text-[11px] sm:text-xs text-slate-300 font-mono space-y-1 pr-1"></div>
@@ -106,7 +109,6 @@
 
   <div id="modal-backdrop" onclick="closeModals()" class="fixed inset-0 modal-backdrop hidden z-40 transition-opacity duration-200"></div>
 
-  <!-- 商店彈窗 -->
   <div id="modal-shop" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-lg bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
     <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-3">
       <h3 class="font-bold text-base sm:text-lg text-amber-400 flex items-center gap-2">🛒 道具商店</h3>
@@ -126,7 +128,6 @@
     <div id="shop-bait-list" class="overflow-y-auto space-y-2.5 pr-1 flex-1 hidden"></div>
   </div>
 
-  <!-- 許願池彈窗 -->
   <div id="modal-fountain" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
     <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-3">
       <h3 class="font-bold text-base sm:text-lg text-pink-400 flex items-center gap-2">⛲ 神秘許願池</h3>
@@ -162,7 +163,93 @@
     </div>
   </div>
 
-  <!-- 圖鑑彈窗 -->
+  <div id="modal-casino" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-lg bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
+    <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-3">
+      <h3 class="font-bold text-base sm:text-lg text-yellow-400 flex items-center gap-2">🎰 海中賭場 (娛樂花錢區)</h3>
+      <button onclick="closeModals()" class="text-slate-400 hover:text-white text-xl font-bold p-2">✕</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1 mb-3 border-b border-slate-700 pb-2">
+      <button id="tab-bj" onclick="switchCasinoTab('bj')" class="py-2 px-1 font-bold text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-xl transition-colors">
+        🃏 21點
+      </button>
+      <button id="tab-slot" onclick="switchCasinoTab('slot')" class="py-2 px-1 font-bold text-xs bg-slate-900 text-slate-400 border border-slate-700 rounded-xl transition-colors">
+        🎰 老虎機
+      </button>
+      <button id="tab-dice" onclick="switchCasinoTab('dice')" class="py-2 px-1 font-bold text-xs bg-slate-900 text-slate-400 border border-slate-700 rounded-xl transition-colors">
+        🎲 骰子比大小
+      </button>
+    </div>
+
+    <!-- 21點 區塊 -->
+    <div id="casino-bj" class="space-y-3 text-xs overflow-y-auto flex-1 pr-1">
+      <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-700/60 text-center space-y-2">
+        <div class="text-slate-400">21點對決 (莊家抽至17點 | 達成5張牌未爆即自動「過五關」獲勝)</div>
+        <div class="flex justify-center items-center gap-2">
+          <span>下注金額:</span>
+          <input id="bj-bet" type="number" value="100" min="10" class="w-24 bg-slate-800 border border-slate-700 text-amber-300 font-bold px-2 py-1 rounded-lg text-center" />
+        </div>
+        <div id="bj-status" class="text-cyan-300 font-medium py-1">準備開始新的一局！</div>
+        <div class="grid grid-cols-2 gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+          <div>
+            <div class="text-slate-400 mb-1">您的手牌 (<span id="bj-player-score">0</span>)</div>
+            <div id="bj-player-cards" class="font-bold text-white text-sm flex flex-wrap justify-center gap-1.5 min-h-[30px] items-center">--</div>
+          </div>
+          <div>
+            <div class="text-slate-400 mb-1">莊家手牌 (<span id="bj-dealer-score">0</span>)</div>
+            <div id="bj-dealer-cards" class="font-bold text-white text-sm flex flex-wrap justify-center gap-1.5 min-h-[30px] items-center">--</div>
+          </div>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button id="bj-btn-start" onclick="bjStart()" class="flex-1 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-2.5 rounded-xl shadow active:scale-95 transition-all">發牌/開始</button>
+          <button id="bj-btn-hit" onclick="bjHit()" disabled class="flex-1 bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl cursor-not-allowed transition-all">要牌 (Hit)</button>
+          <button id="bj-btn-stand" onclick="bjStand()" disabled class="flex-1 bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl cursor-not-allowed transition-all">停牌 (Stand)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 老虎機 區塊 -->
+    <div id="casino-slot" class="space-y-3 text-xs overflow-y-auto flex-1 pr-1 hidden">
+      <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/60 text-center space-y-3">
+        <div class="text-slate-400">海中幸運拉霸機 (三中得 5x/10x，全中鑽石得 20x)</div>
+        <div class="flex justify-center items-center gap-2">
+          <span>下注金額:</span>
+          <input id="slot-bet" type="number" value="50" min="10" class="w-24 bg-slate-800 border border-slate-700 text-amber-300 font-bold px-2 py-1 rounded-lg text-center" />
+        </div>
+        <div class="flex justify-center gap-3 my-2">
+          <div id="slot-1" class="w-14 h-16 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-2xl shadow-inner font-mono transition-transform duration-100">🐟</div>
+          <div id="slot-2" class="w-14 h-16 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-2xl shadow-inner font-mono transition-transform duration-100">🐙</div>
+          <div id="slot-3" class="w-14 h-16 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-2xl shadow-inner font-mono transition-transform duration-100">⭐</div>
+        </div>
+        <div id="slot-status" class="text-amber-300 font-medium">按下轉動按鈕試試手氣！</div>
+        <button onclick="spinSlot()" id="slot-btn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-slate-950 font-bold py-3 rounded-xl shadow active:scale-95 transition-all">
+          🎰 轉動拉霸機
+        </button>
+      </div>
+    </div>
+
+    <!-- 骰子大小 區塊 -->
+    <div id="casino-dice" class="space-y-3 text-xs overflow-y-auto flex-1 pr-1 hidden">
+      <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/60 text-center space-y-3">
+        <div class="text-slate-400">三顆骰子點數總和 (4~10為小，11~17為大，圍骰全吃)</div>
+        <div class="flex justify-center items-center gap-2">
+          <span>下注金額:</span>
+          <input id="dice-bet" type="number" value="100" min="10" class="w-24 bg-slate-800 border border-slate-700 text-amber-300 font-bold px-2 py-1 rounded-lg text-center" />
+        </div>
+        <div class="flex justify-center gap-3 my-2 text-3xl">
+          <div id="dice-1" class="w-14 h-14 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-amber-300 shadow-inner">⚀</div>
+          <div id="dice-2" class="w-14 h-14 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-amber-300 shadow-inner">⚁</div>
+          <div id="dice-3" class="w-14 h-14 bg-slate-950 border border-slate-700 rounded-xl flex items-center justify-center text-amber-300 shadow-inner">⚂</div>
+        </div>
+        <div id="dice-status" class="text-cyan-300 font-medium">請選擇押「大」或押「小」！ (賠率 2x)</div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="playDice('small')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl shadow active:scale-95 transition-all">押 小 (4-10點)</button>
+          <button onclick="playDice('big')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl shadow active:scale-95 transition-all">押 大 (11-17點)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-photo" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-xl bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
     <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-2.5">
       <h3 class="font-bold text-base sm:text-lg text-cyan-400 flex items-center gap-2">📖 魚類圖鑑</h3>
@@ -170,14 +257,13 @@
     </div>
     
     <div class="flex justify-between items-center text-[11px] sm:text-xs text-slate-400 mb-2.5">
-      <span>收集各式魚種解鎖成就！</span>
+      <span>收集各式魚種解鎖成就與稀有釣竿！</span>
       <span id="encyclopedia-count" class="text-cyan-300 font-bold">已解鎖: 0 / 22</span>
     </div>
 
     <div id="photo-grid" class="overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 pr-1 flex-1"></div>
   </div>
 
-  <!-- 成就彈窗 -->
   <div id="modal-archive" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
     <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-2.5">
       <h3 class="font-bold text-base sm:text-lg text-emerald-400 flex items-center gap-2">🏆 成就總覽</h3>
@@ -187,7 +273,6 @@
     <div id="archive-list" class="overflow-y-auto space-y-2 pr-1 flex-1"></div>
   </div>
 
-  <!-- 設定彈窗 -->
   <div id="modal-stats" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl hidden z-50 max-h-[85dvh] flex flex-col">
     <div class="flex justify-between items-center pb-2.5 border-b border-slate-700 mb-2.5">
       <h3 class="font-bold text-base sm:text-lg text-purple-400 flex items-center gap-2">⚙️ 統計與設定</h3>
